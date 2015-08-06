@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/back">
+
+    <TextView
+        android:id="@+id/playelistTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Room Title"
+        android:textSize="10dp"
+        android:gravity="center"/>
+    <ListView
+        android:id="@+id/playerlistView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="8"
+        android:dividerHeight="1dp"
+        android:divider="#ffffffff">
+    </ListView>
+</LinearLayout>

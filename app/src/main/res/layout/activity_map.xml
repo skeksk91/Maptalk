@@ -1,0 +1,27 @@
+<FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:id="@+id/mapLayout">
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        class="com.google.android.gms.maps.SupportMapFragment"
+        tools:layout="@layout/activity_map" />
+    <Button
+        android:id="@+id/sampleBut"
+        android:text="채팅열기"
+        android:textSize="10dip"
+        android:textColor= "#FF708090"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom"
+        android:background="#FFFFFAF0"
+        android:padding="4dp"
+        android:layout_margin="10dp"
+        />
+</FrameLayout>
+

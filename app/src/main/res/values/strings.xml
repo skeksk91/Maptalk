@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MapTalk</string>
+    <string name="title"></string>
+    <string name="id">ID : </string>
+    <string name="pwd">Pwd : </string>
+    <string name="title_roomoption">방 만들기</string>
+    <string name="action_settings">Settings</string>
+</resources>

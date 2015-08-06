@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="floor4.maptalk" >
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 내 프로젝트에 대한 보안 수준 설정. 내 프로젝트의 패키지가 org.androidtown.lbs.map 인 경우 -->
+    <permission
+        android:name="jethop.mapactivity.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+    <!-- 구글맵 API v2의 권한 설정 -->
+    <uses-permission android:name="jethop.mapacitivity.permission.MAPS_RECEIVE" />
+
+    <!-- 구글맵 API v2의 일반 권한 설정. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />"
+
+    <!-- 일반 권한 설정 -->
+    <uses-permission android:name="android.permission.write_external_storage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- OpenGL 사용 설정 -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".Login.LoginActivity"
+            android:label="@string/app_name">
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Login.JoinActivity"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:label="회원가입">
+        </activity>
+        <activity
+            android:name=".Lobby.LobbyActivity"></activity>
+        <activity
+            android:name=".Lobby.RoomCreateOptionActivity"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:label="@string/title_roomoption">
+        </activity>
+        <activity
+            android:name=".Lobby.RoomPasswordActivity"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:label="암호 입력">
+        </activity>
+        <activity android:name=".Chat.ChatActivity"
+            android:windowSoftInputMode="stateUnchanged"></activity>
+
+        <!-- 라이브러리 사용 설정 -->
+        <uses-library android:name="com.google.android.maps" />
+        <!-- 구글맵 API v2 키 설정 -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAdyVHkJzKRdHBKcoEycn17G0LSBVCDvIM" />
+        <!-- GMS 라이브러리 버전 설정 -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".Map.MapActivity"
+            android:label="@string/app_name" >
+
+        </activity>
+    </application>
+</manifest>
