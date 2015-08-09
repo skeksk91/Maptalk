@@ -1,5 +1,6 @@
 package floor4.maptalk.Login;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -26,15 +27,15 @@ public class JoinActivity extends ActionBarActivity  {
         setContentView(R.layout.activity_join);
     }
 
-    //Àû¿ë ¹öÆ°
+    //ì ìš© ë²„íŠ¼
     public void onJoinCompleteClicked(View v) {
         String id, pwd;
         EditText id_text = (EditText)findViewById(R.id.join_id_text);
         EditText password_text = (EditText)findViewById(R.id.join_pwd_text);
         if(id_text.length() == 0 || id_text.length() > 20 ||
                 password_text.length() == 0 || password_text.length() > 20){
-            Toast toast = Toast.makeText(getBaseContext(),
-                    "´Ù½Ã ÀÔ·ÂÇÏ¿© ÁÖ½Ê½Ã¿À.",Toast.LENGTH_LONG);
+            Toast.makeText(getBaseContext(),
+                    "ë‹¤ì‹œ ìž…ë ¥í•˜ì—¬ ì£¼ì‹­ì‹œì˜¤.",Toast.LENGTH_SHORT).show();
             return;
         }
         id = id_text.getText().toString();
@@ -45,7 +46,7 @@ public class JoinActivity extends ActionBarActivity  {
         setResult(RESULT_OK, resultIntent);
         finish();
     }
-    //Ãë¼Ò ¹öÆ°
+    //ì·¨ì†Œ ë²„íŠ¼
     public void onCancelClicked(View v) {
         finish();
     }

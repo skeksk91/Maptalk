@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import floor4.maptalk.Chat.ChatActivity;
 import floor4.maptalk.Data.RoomInfo;
 import floor4.maptalk.MSG.MSGRequestCreateRoom;
 import floor4.maptalk.MSG.MSGRequestIntoRoom;
@@ -30,10 +29,10 @@ import floor4.maptalk.R;
  * Created by Administrator on 2015-06-28.
  */
 public class LobbyActivity extends ActionBarActivity{
-
-    public static LobbyActivity LobbyClass;
     public static final int CONFIG_CODE_ROOM_CREATE_OPTION=1002;
     public static final int CONFIG_CODE_ROOM_PASSWORD=1003;
+    public static final int ACT_RESULTCODE_ROOMOUT=1004;
+    public static LobbyActivity lobbyClass; //나중에 Activity Manager에 등록하는데 쓰임.. 모두 한번에 종료..
     public LobbyMassgeHandler handler = new LobbyMassgeHandler();
     public LobbyActivity refClass = this;
     private ListView listView;
@@ -44,15 +43,12 @@ public class LobbyActivity extends ActionBarActivity{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
-
-        LobbyClass = this;
-
+        lobbyClass = this;
         createRoomButton = (Button)findViewById(R.id.addGroup);
 
         listView = (ListView)findViewById(R.id.listView);
 
-        MSGRequestRoomList rq = new MSGRequestRoomList();
-        rq.setKey(Network_Resource.key);
+        MSGRequestRoomList rq = new MSGRequestRoomList(Network_Resource.key);
         (new Msg_Request_Thread("MSGRequestRoomList", handler)).execute(rq);
 
         //방 참가 요청 메시지 처리부분.
@@ -66,6 +62,7 @@ public class LobbyActivity extends ActionBarActivity{
                     String pwd = "";
                     Intent intent = new Intent(getApplicationContext(), RoomPasswordActivity.class);
                     intent.putExtra(RoomInfo.PARCELKEY_DATA_CREATE, pwd);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivityForResult(intent, CONFIG_CODE_ROOM_PASSWORD);  // 다이얼로그 띄우고 결과 따로 처리
                 } else {
                     // 방의 암호가 없으면 바로 참가요청 보냄.
@@ -91,12 +88,12 @@ public class LobbyActivity extends ActionBarActivity{
         RoomInfo roomInfo = new RoomInfo(0,"","",0);
         Intent intent = new Intent(getApplicationContext(), RoomCreateOptionActivity.class);
         intent.putExtra(RoomInfo.PARCELKEY_DATA_CREATE, roomInfo);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivityForResult(intent, CONFIG_CODE_ROOM_CREATE_OPTION);
     }
 
     public void onRefreshClicked(View v){
-        MSGRequestRoomList rq = new MSGRequestRoomList();
-        rq.setKey(Network_Resource.key);
+        MSGRequestRoomList rq = new MSGRequestRoomList(Network_Resource.key);
 
         //#UNDEBUG
         (new Msg_Request_Thread("MSGRequestRoomList", handler)).execute(rq);
@@ -105,7 +102,6 @@ public class LobbyActivity extends ActionBarActivity{
     // 방 만들기 액티비티와 통신.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == CONFIG_CODE_ROOM_CREATE_OPTION) {  // 방 만들기 다이얼로그 결과 받은 것
             Toast toast = Toast.makeText(getBaseContext(),
                     "okok" + requestCode + "결과코드 : " + resultCode, Toast.LENGTH_LONG);
@@ -124,8 +120,8 @@ public class LobbyActivity extends ActionBarActivity{
                     toast.show();
 
 
-                /*
-                // ############################################################
+
+                /*// ############################################################
                 //#DEBUG -- 테스트할때 통신없이 응답을 받았다고 가정.
                 Message msg;
                 msg = Message.obtain();
@@ -135,8 +131,6 @@ public class LobbyActivity extends ActionBarActivity{
                 handler.sendMessage(msg);
                 // ############################################################
                 */
-
-                //#UNDEBUG
                 // 방만들기 요청 메시지 생성
                 MSGRequestCreateRoom msg_roomCreate = new MSGRequestCreateRoom(
                         roomInfo.getTitle(), roomInfo.getPassword(), roomInfo.getMaxpersons());
@@ -151,7 +145,6 @@ public class LobbyActivity extends ActionBarActivity{
                 String pwd = bundle.getString(RoomInfo.PARCELKEY_DATA_PASSWORD);
                 Log.e("join", pwd +" " + r.getTitle());
                 MSGRequestIntoRoom rq = new MSGRequestIntoRoom(Network_Resource.key, r.getRoomnumber(), pwd);
-
                 /*
                 // ############################################################
                 //#DEBUG -- 테스트할때 통신없이 응답을 받았다고 가정.
@@ -165,8 +158,17 @@ public class LobbyActivity extends ActionBarActivity{
                 // ############################################################
                 */
                 //#UNDEBUG
-                (new Msg_Request_Thread("MSGRequestIntoRoom", handler)).execute(rq); // 방 창가 요청
+                (new Msg_Request_Thread("MSGRequestIntoRoom", handler)).execute(rq); // 방 참가 요청
             }
+        }
+        else if( requestCode ==  ACT_RESULTCODE_ROOMOUT) {
+            //방에서 나갔다는 것은 MapActivity를 껐다는 것과 같다고 볼 수 있음
+            //그러므로 이 시점에서 방 나갔음을 서버에서 알리는 것이 가장 합리적.
+            if(resultCode != RESULT_OK) {
+                Log.e("Lobby onActivityResult", "MapActivity가 비정상 종료됨");
+            }
+            MSGRequestRoomList rq = new MSGRequestRoomList(Network_Resource.key);
+            (new Msg_Request_Thread("MSGRequestRoomList", handler)).execute(rq);
         }
     }
 
@@ -183,13 +185,15 @@ public class LobbyActivity extends ActionBarActivity{
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             Intent intent;
-            if(msg.obj == null){
+            if(msg.obj == null) {
                 Toast.makeText(getApplicationContext(),
-                        "네트워크 문제가 발생하였습니다.", Toast.LENGTH_LONG).show();
+                        "네트워크 문제가 발생하였습니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
             switch (msg.what) {
+
                 case Network_Resource.MSGResponseRoomList:   // 방 리스트 받은 것에 대한 처리
+
                     MSGResponseRoomList responseRoomList = (MSGResponseRoomList)msg.obj;
                     Log.e("LobbyMassgeHandler", ""+ responseRoomList.result);
                     if(responseRoomList.result != 1) {
@@ -205,18 +209,23 @@ public class LobbyActivity extends ActionBarActivity{
                     break;
 
                 case Network_Resource.MSGResponseRoomCreate:   // 방 만들기에 대한 응답처리.
+                    if(msg.obj == null) {
+                        Log.e("MSGResponseRoomCreate","네트워크에러");
+                        return;
+                    }
                     MSGResponseRoomInfo responseRoomCreate = (MSGResponseRoomInfo)msg.obj;
-                    RoomInfo roomInfo = responseRoomCreate.room;
+                    Log.e("create", "result: " + responseRoomCreate.result);
                     if(responseRoomCreate.result != Network_Resource.NET_RESULT_OK) {
                         errorHandling(msg.what, responseRoomCreate.result);
                         return; // 결과가 거부이면 함수 종료
                     }
 
                     //#UNDEBUG
-                    Log.i("create", "start MapActivity ");
-                    enterRoom(roomInfo.getTitle());
+                    RoomInfo roomInfo = responseRoomCreate.room;
+                    Log.i("create", "start MapActivity title: " + roomInfo.getTitle());
+                    enterRoom(roomInfo.getTitle(), roomInfo.getChatNumber());
 
-                    /*
+                    /*#DEBUG
                     //#DEBUG_CHAT
                     Intent intent2 = new Intent(getApplicationContext(), ChatActivity.class);
                     intent2.putExtra("title", roomInfo.getTitle());
@@ -235,22 +244,23 @@ public class LobbyActivity extends ActionBarActivity{
                     MSGResponseRoomInfo responseIntoRoom = (MSGResponseRoomInfo)msg.obj;
                     Log.i("IntoRoom핸들링", "start...");
 
-                    if(responseIntoRoom.result == 1){  // 방 참가 성공
-                        enterRoom(responseIntoRoom.room.getTitle());
-                    }
-                    else{   // 방 참가 실패!!!!!!!! ( result가 0 : 암호틀림,  -1 : 방 꽉참)
+                    if(responseIntoRoom.result != 1){  // 방 참가 성공
                         errorHandling(msg.what,responseIntoRoom.result);
                         return;
                     }
+                    enterRoom(responseIntoRoom.room.getTitle(),
+                            responseIntoRoom.room.getChatNumber());
                     break;
                 default:
                     break;
             }
         }
-        public void enterRoom(String title) {
+        public void enterRoom(String title, int chatNumber) {
             Intent intent = new Intent(getApplicationContext(), MapActivity.class);
             intent.putExtra("title", title);
-            startActivity(intent);
+            intent.putExtra("title", chatNumber);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivityForResult(intent, ACT_RESULTCODE_ROOMOUT);
         }
         void errorHandling(int type, int result) {
             switch(type) {
@@ -258,8 +268,7 @@ public class LobbyActivity extends ActionBarActivity{
                     break;
                 case Network_Resource.MSGResponseRoomCreate:
                     if(result == -1) { // 로그아웃된 상태. 초기 로그인 액티비티로 이동
-                        Toast.makeText(getApplicationContext(),
-                                "다른 곳에서 접속하여 현 계정이 로그아웃 되었습니다.", Toast.LENGTH_LONG).show();
+                        errorToast("다른 곳에서 접속하여 현 계정이 로그아웃 되었습니다.");
                         finish();
                     }
                     break;
@@ -276,7 +285,7 @@ public class LobbyActivity extends ActionBarActivity{
             }
         }
         void errorToast(String str){
-            Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
         }
     }
 }

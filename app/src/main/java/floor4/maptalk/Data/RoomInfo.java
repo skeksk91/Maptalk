@@ -14,11 +14,10 @@ public class RoomInfo implements Parcelable{
     private int roomNumber = 0;
     private int curPersons = 0;
     private int maxPersons = 0;
+    private int chatNumber = 0;
     private int option;
     private int isPassword = 0;
-    private String[] idList = new String[100];  //이거 크기 안정해도 될듯?
 
-    public String[] getIdList() { return idList;}
     public RoomInfo(int roomNumber, String title, String password, int maxPersons) {
         this.roomNumber = roomNumber;
         this.title   = title;
@@ -35,6 +34,8 @@ public class RoomInfo implements Parcelable{
     public String getPersons() { return getCurpersons() + "/" + getMaxpersons();}
     public void setmaxPerson(int maxPersons) {this.maxPersons = maxPersons; }
     public void setHavePassword() {this.isPassword = 1;}
+    public int getChatNumber() { return chatNumber; }
+
     public int havePassword(){return isPassword;}
     // Parcel 처리-----------
     public RoomInfo(Parcel src) {

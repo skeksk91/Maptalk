@@ -125,6 +125,7 @@ public class LoginActivity extends ActionBarActivity {
     public void OnJoinClicked(View v){
         MSGRequestJoin join = new MSGRequestJoin("", "");
         Intent intent = new Intent(getApplicationContext(), JoinActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivityForResult(intent, CONFIG_CODE_JOIN);
     }
 
@@ -161,6 +162,7 @@ public class LoginActivity extends ActionBarActivity {
                                 "로그인 성공~!", Toast.LENGTH_LONG).show();
                         Network_Resource.key = resultObj.key;  // 키 할당
                         Intent intent = new Intent(context, LobbyActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent);
                     }
                     else  if(resultObj.result == 2) {

@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -13,52 +15,64 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by 정우 on 2015-07-11.
  */
 public class Request_and_Get {
-    StringEntity se;
     Gson gson = new Gson();
-    String url;
+    URL url;
+    String stringJson;
     public Request_and_Get(String stringJson, String url){  // obj : 보낼 객체,  url : 보낼 주소
-        this.url = url;
         try {
-            se= new StringEntity(stringJson);
-        } catch (UnsupportedEncodingException e) {
+            this.url = new URL(url);
+            this.stringJson = stringJson;
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
     }
     public String getResult(){ // 서버에서 받은 데이터(json형식 String) 반환
-        Log.e("sendHttpWithMsg", "111");
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpPost post = new HttpPost(url);
-        HttpParams params = client.getParams();
-        HttpConnectionParams.setConnectionTimeout(params, 3000);
-        HttpConnectionParams.setSoTimeout(params, 3000);
-        post.setHeader("Content-type", "application/json; charset=utf-8");
-        HttpEntity he=se;
-        post.setEntity(he);
+        Log.e("sendHttpWithMsg", "start...");
+        HttpURLConnection conn;
         try {
-            HttpResponse response = client.execute(post);
-            BufferedReader bufReader = new BufferedReader(new InputStreamReader(
-                    response.getEntity().getContent(),
-                    "utf-8"
-            )
-            );
+            conn = (HttpURLConnection)url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setRequestProperty("Content-type", "application/json; charset=utf-8");
+            conn.setRequestMethod("POST");
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(3000);
+            OutputStream os = conn.getOutputStream();
+            os.write(stringJson.getBytes("UTF-8"));
+            os.flush();
+
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (conn.getInputStream())));
+
             String line = null;
             String result = "";
-            while ((line = bufReader.readLine())!=null){
-                result +=line;
+            while ((line = br.readLine()) != null) {
+                result+= line;
             }
-            Log.e("test","responce result(json) :"+result); // 결과 테스트
+            conn.disconnect();
             return result;
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("test", "errer asdfsdkf"); // 결과 테스트
+            Log.e("test", "Request_and_Get error"); // 결과 테스트
             return null;
         }
     }

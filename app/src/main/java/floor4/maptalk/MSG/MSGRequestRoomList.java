@@ -5,7 +5,7 @@ package floor4.maptalk.MSG;
  */
 public class MSGRequestRoomList {
     private int key;
-    public void setKey(int key){
+    public MSGRequestRoomList(int key){
         this.key = key;
     }
 }

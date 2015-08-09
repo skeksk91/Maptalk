@@ -8,15 +8,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="left"
-        android:textSize = "20dp"
+        android:textSize = "12dp"
         android:padding="4dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:textColor="#FFFFFFFF"/>
     <TextView
         android:id="@+id/chat_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="center"
-        android:textSize = "20dp"
+        android:textSize = "12dp"
         android:padding="4dp"
-        android:layout_weight="7"/>
+        android:layout_weight="5"
+        android:textColor="#FFFFFFFF"/>
 </LinearLayout>

@@ -18,22 +18,19 @@
         android:layout_height="wrap_content"
         android:focusable="false"
         android:focusableInTouchMode="false">
-        <Button
-            android:id="@+id/addGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="10"
-            android:text="+"
-            android:textSize="30dp"
-            android:onClick="onCreateRoomClicked"
-            android:focusable="false"
-            android:focusableInTouchMode="false" />
+    <Button
+        android:id="@+id/addGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="                +                 "
+        android:textSize="30dp"
+        android:onClick="onCreateRoomClicked"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:layout_gravity="right"
-            android:singleLine="true"
             android:gravity="center"
             android:text="refresh"
             android:onClick="onRefreshClicked"
