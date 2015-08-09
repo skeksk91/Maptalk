@@ -183,13 +183,15 @@ public class LobbyActivity extends ActionBarActivity{
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             Intent intent;
-
+            if(msg.obj == null){
+                Toast.makeText(getApplicationContext(),
+                        "네트워크 문제가 발생하였습니다.", Toast.LENGTH_LONG).show();
+                return;
+            }
             switch (msg.what) {
                 case Network_Resource.MSGResponseRoomList:   // 방 리스트 받은 것에 대한 처리
-                    if(msg.obj == null){
-                        return;
-                    }
                     MSGResponseRoomList responseRoomList = (MSGResponseRoomList)msg.obj;
+                    Log.e("LobbyMassgeHandler", ""+ responseRoomList.result);
                     if(responseRoomList.result != 1) {
                         errorHandling(msg.what, responseRoomList.result);
                         return; //  결과 거부면 함수 종료
@@ -251,12 +253,8 @@ public class LobbyActivity extends ActionBarActivity{
             startActivity(intent);
         }
         void errorHandling(int type, int result) {
-            Toast toast = new Toast(getBaseContext());
-            toast.setDuration(Toast.LENGTH_SHORT);
             switch(type) {
                 case Network_Resource.MSGResponseRoomList :
-                    if(result == 0)
-                    toast.setText("get room List Failed");
                     break;
                 case Network_Resource.MSGResponseRoomCreate:
                     if(result == -1) { // 로그아웃된 상태. 초기 로그인 액티비티로 이동
@@ -266,14 +264,19 @@ public class LobbyActivity extends ActionBarActivity{
                     }
                     break;
                 case Network_Resource.MSGResponseIntoRoom :
-                    if(result == -1)         finish(); // 로그아웃된 상태. 초기 로그인 액티비티로 이동
-                    else if(result == -2)   toast.setText("비밀번호가 틀렸습니다.");
-                    else if(result == -3)   toast.setText("방의 인원이 꽉 찼습니다.");
-                    else if(result == -4)   toast.setText("존재하지 않는 방입니다.");
-                    else                    toast.setText("Unknown Error");
+                    if(result == -1)         {
+                        errorToast("로그아웃 되었습니다.");
+                        finish(); // 로그아웃된 상태. 초기 로그인 액티비티로 이동
+                    }
+                    else if(result == -2)   errorToast("비밀번호가 틀렸습니다.");
+                    else if(result == -3)   errorToast("방의 인원이 꽉 찼습니다.");
+                    else if(result == -4)   errorToast("존재하지 않는 방입니다.");
+                    else                    errorToast("Unknown Error");
                     break;
             }
-            toast.show();
+        }
+        void errorToast(String str){
+            Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -42,6 +43,9 @@ public class Msg_Request_Thread extends AsyncTask<Object, Void, Void>{
 
     protected void onPostExecute(Void aVoid) { // 스레드가 끝나고 할 일 지정.
         super.onPostExecute(aVoid);
+        if(result == null){
+            return;
+        }
         Message msg = new Message();
         Object result_object = null;
         if(msgType.equals("MSGRequestLogin")){  // 로그인 요청

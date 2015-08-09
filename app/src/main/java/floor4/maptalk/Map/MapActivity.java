@@ -457,6 +457,10 @@ public class MapActivity extends ActionBarActivity {
                 //--------------------------요청 전송 부분-----------------------------
                 Request_and_Get rq = new Request_and_Get(stringJson, URL); // obj 객체를 서버에 보낸다.
                 result = rq.getResult(); // 결과를 result에 저장한다. (JsonString 상태이다)
+                if(result == null) {
+                    Toast.makeText(getApplicationContext(), "네트워크 연결에 문제가 있습니다.", Toast.LENGTH_SHORT).show();
+                    continue;
+                }
                 msgResponseMapInfo = gson.fromJson(result, MSGResponseMapInfo.class);
                 msg = handler.obtainMessage();
                 msg.what = Network_Resource.MSGResponseMapInfo;

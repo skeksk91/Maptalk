@@ -127,6 +127,11 @@ public class ChatActivity extends ActionBarActivity{
         }
         public void run() {
             while(is_running) {
+                try {
+                    sleep(300); // 채팅 리스트 요청 간격
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 send_object = new MSGRequestChatInfo(Network_Resource.key, chatNumber); // 채팅 리스트 요청 메시지 생성
 
                 String stringJson = gson.toJson(send_object);
@@ -139,6 +144,7 @@ public class ChatActivity extends ActionBarActivity{
                     Toast.makeText(getApplicationContext(),
                             "네트워크 연결을 확인하십시오.",
                             Toast.LENGTH_LONG).show();
+                    continue;
                 }
                 msg = handler.obtainMessage();
                 msg.what = Network_Resource.MSGResponseChatInfo;
@@ -146,12 +152,6 @@ public class ChatActivity extends ActionBarActivity{
 
                 if(handler != null && msg != null)
                     handler.sendMessage(msg);
-
-                try {
-                    sleep(500); // 채팅 리스트 요청 간격
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         }
     }
